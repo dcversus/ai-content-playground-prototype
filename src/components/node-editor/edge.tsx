@@ -1,5 +1,6 @@
 import { BaseEdge, EdgeProps, getBezierPath } from '@xyflow/react'
 import { Trash2 } from 'lucide-react'
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,7 +12,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-
 import { Button } from '@/components/ui/button'
 
 export function CustomEdge({
@@ -24,7 +24,7 @@ export function CustomEdge({
   targetPosition,
   style = {},
   markerEnd,
-  data
+  data,
 }: EdgeProps & { data: { onDelete: (id: string) => void } }) {
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
@@ -62,10 +62,14 @@ export function CustomEdge({
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={(event) => {
-                  event.stopPropagation()
-                  data.onDelete(id)
-                }}>Delete</AlertDialogAction>
+                <AlertDialogAction
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    data.onDelete(id)
+                  }}
+                >
+                  Delete
+                </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>

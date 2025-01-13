@@ -12,7 +12,12 @@ export function ImageWidget({ imgUrlContent, imgUrlBaked, onNext, isLastNode }: 
   return (
     <Card className="w-full max-w-3xl">
       <CardContent className="p-0">
-        <img src={imgUrlBaked || imgUrlContent} alt="Content" className="w-full rounded-lg object-cover" loading="lazy" />
+        <img
+          src={imgUrlBaked || imgUrlContent}
+          alt="Content"
+          className="w-full rounded-lg object-cover"
+          loading="lazy"
+        />
       </CardContent>
       {isLastNode && (
         <CardFooter className="mt-4">

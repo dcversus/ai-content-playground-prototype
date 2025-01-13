@@ -1,5 +1,5 @@
-import { Handle, NodeProps, Position, NodeToolbar } from '@xyflow/react'
-import { Pen, Trash2 } from 'lucide-react'
+import { Handle, NodeProps, NodeToolbar, Position } from '@xyflow/react'
+import { Trash2 } from 'lucide-react'
 
 import {
   AlertDialog,
@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 import { Editor } from './editor.tsx'
-import { typeToIcon, NodeType } from './types'
+import { NodeType, typeToIcon } from './types'
 
 type NodeData = {
   type: NodeType
@@ -40,11 +40,20 @@ export function CustomNode({ data, id, selected }: NodeProps & { data: NodeData 
     return 'text-muted-foreground/50'
   }
 
-  const Icon = typeToIcon[data.type as keyof typeof typeToIcon];
+  const Icon = typeToIcon[data.type as keyof typeof typeToIcon]
 
   return (
-    <div className={cn("relative rounded-lg border bg-card p-4 shadow-sm", selected && "border-primary")}>
-      <NodeToolbar className="bg-background/80 backdrop-blur-sm" position={Position.Top} offset={10}>
+    <div
+      className={cn(
+        'relative rounded-lg border bg-card p-4 shadow-sm',
+        selected && 'border-primary'
+      )}
+    >
+      <NodeToolbar
+        className="bg-background/80 backdrop-blur-sm"
+        position={Position.Top}
+        offset={10}
+      >
         <div className="flex items-center gap-1">
           <Editor data={data} id={id} key={id} />
           <AlertDialog>
@@ -74,10 +83,14 @@ export function CustomNode({ data, id, selected }: NodeProps & { data: NodeData 
       <Handle type="source" position={Position.Bottom} />
 
       <div className="flex items-center gap-2">
-        <span className="text-lg"><Icon /></span>
+        <span className="text-lg">
+          <Icon />
+        </span>
         <span className="font-medium">{data?.label}</span>
         {data?.difficult && (
-          <Badge variant="secondary" className={cn('text-sm', getDifficultColor(data.difficult))}>{data.difficult}</Badge>
+          <Badge variant="secondary" className={cn('text-sm', getDifficultColor(data.difficult))}>
+            {data.difficult}
+          </Badge>
         )}
       </div>
 

@@ -8,7 +8,7 @@ interface VideoWidgetProps {
 }
 
 export function VideoWidget({ videoUrlBaked, onNext, isLastNode }: VideoWidgetProps) {
-  const videoUrl = videoUrlBaked;
+  const videoUrl = videoUrlBaked
   const isYouTube = videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')
 
   return (

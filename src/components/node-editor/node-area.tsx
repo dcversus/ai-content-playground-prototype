@@ -3,7 +3,6 @@ import {
   Controls,
   Edge,
   EdgeTypes,
-  MiniMap,
   Node,
   NodeTypes,
   OnEdgesChange,
@@ -11,11 +10,12 @@ import {
   ReactFlow,
 } from '@xyflow/react'
 
+import { DevTools } from '@/components/devtools'
+
 import { CustomEdge } from './edge.tsx'
 import { CustomNode } from './node.tsx'
 
-import '@xyflow/react/dist/style.css';
-import { DevTools } from "@/components/devtools";
+import '@xyflow/react/dist/style.css'
 
 const nodeTypes: NodeTypes = {
   custom: CustomNode,

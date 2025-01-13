@@ -1,12 +1,16 @@
 import OpenAI from 'openai'
-import { ChatCompletionMessageParam } from 'openai/resources/chat/completions.mjs';
+import { ChatCompletionMessageParam } from 'openai/resources/chat/completions.mjs'
 
 const openai = new OpenAI({
   apiKey: import.meta.env.VITE_OPENAI_API_KEY,
   dangerouslyAllowBrowser: true,
 })
 
-export async function llmRequest(message: string, prompt: string, systemContext?: string): Promise<string> {
+export async function llmRequest(
+  message: string,
+  prompt: string,
+  systemContext?: string
+): Promise<string> {
   const completion = await openai.chat.completions.create({
     messages: [
       { role: 'user', content: message },
@@ -16,10 +20,16 @@ export async function llmRequest(message: string, prompt: string, systemContext?
     model: 'gpt-4-turbo-preview',
   })
 
-  return completion.choices[0].message.content || 'Ooops... something went wrong, please reset progress.';
+  return (
+    completion.choices[0].message.content || 'Ooops... something went wrong, please reset progress.'
+  )
 }
 
-export async function llmSystemRequest<T>(prompt: string, schema: T, systemContext: string): Promise<T> {
+export async function llmSystemRequest<T>(
+  prompt: string,
+  schema: T,
+  systemContext: string
+): Promise<T> {
   const completion = await openai.chat.completions.create({
     messages: [
       { role: 'user', content: prompt },
@@ -29,9 +39,9 @@ export async function llmSystemRequest<T>(prompt: string, schema: T, systemConte
     model: 'gpt-4-turbo-preview',
   })
 
-  const textResponse = completion.choices[0].message.content;
-  const filteredResponse = textResponse?.replace(/```json\n([\s\S]*)\n```/g, '$1');
-  return JSON.parse(filteredResponse || '{}') as T;
+  const textResponse = completion.choices[0].message.content
+  const filteredResponse = textResponse?.replace(/```json\n([\s\S]*)\n```/g, '$1')
+  return JSON.parse(filteredResponse || '{}') as T
 }
 
 export async function generateImage(prompt: string): Promise<string> {
@@ -91,19 +101,19 @@ Use all the markdown features.
 Highlight important parts of the response with bold or italic like in nintendo games
 Split pieces of the text into separate logicaly organized paragraphs. Try to avoid long paragraphs.
 You are also given a context of the previous messages and you need to generate a text based on that context.
-`;
+`
 
 export const SYSTEM_QUIZ_PROMPT = `
 Build a briefly quiz description based on a prompt:
-`;
+`
 
 export const SYSTEM_INPUT_PROMPT = `
 You asking student about something. Provide a little help to him, but dont bore and just concentate to waiting his answer. Prompt for asking:
-`;
+`
 
 export const SYSTEM_CARDS_PROMPT = `
 We asking student about something. Create brief question based on a prompt:
-`;
+`
 
 export const SYSTEM_FINISH_COURSE_PROMPT = `
 Student has finished the course. Since then, doesnt include context about course to another contexts, just briefly summarize previus interactions and prepare for the next course

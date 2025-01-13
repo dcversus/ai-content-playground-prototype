@@ -1,7 +1,19 @@
-import { generateImage, llmRequest, SYSTEM_QUIZ_PROMPT, SYSTEM_INPUT_PROMPT, SYSTEM_TEXT_PROMPT, SYSTEM_CARDS_PROMPT, llmSystemRequest, NEXT_NODE_DECISION_PROMPT, BASE_HISTORY_PROMPT, SYSTEM_FINISH_COURSE_PROMPT } from '@/lib/openai'
-import { merge } from 'lodash'
 import { createContext, ReactNode, useContext, useEffect, useReducer } from 'react'
+import { merge } from 'lodash'
 import { toast } from 'sonner'
+
+import {
+  BASE_HISTORY_PROMPT,
+  generateImage,
+  llmRequest,
+  llmSystemRequest,
+  NEXT_NODE_DECISION_PROMPT,
+  SYSTEM_CARDS_PROMPT,
+  SYSTEM_FINISH_COURSE_PROMPT,
+  SYSTEM_INPUT_PROMPT,
+  SYSTEM_QUIZ_PROMPT,
+  SYSTEM_TEXT_PROMPT,
+} from '@/lib/openai'
 import seedData from '@/seed.json'
 
 type NodeId = string
@@ -73,9 +85,15 @@ type Action =
   | { type: 'RESET_LEVEL' }
   | { type: 'START_COURSE'; payload: string }
   | {
-    type: 'NEXT_NODE'
-    payload: { currentCourseId: string; nextNodeId: string; currentNodeId: string; type: 'next' | 'quiz' | 'input'; data?: any }
-  }
+      type: 'NEXT_NODE'
+      payload: {
+        currentCourseId: string
+        nextNodeId: string
+        currentNodeId: string
+        type: 'next' | 'quiz' | 'input'
+        data?: any
+      }
+    }
   | { type: 'REMOVE_EDGE'; payload: { courseId: string; edgeId: string } }
   | { type: 'START_LOADING' }
   | { type: 'END_LOADING' }
@@ -132,9 +150,7 @@ function reducer(state: Store, action: Action): Store {
         ...state,
         nodes: [...state.nodes, nodeWithPosition],
         courses: state.courses.map((c) =>
-          c.id === action.payload.courseId
-            ? { ...c, nodes: [...c.nodes, nodeWithPosition.id] }
-            : c
+          c.id === action.payload.courseId ? { ...c, nodes: [...c.nodes, nodeWithPosition.id] } : c
         ),
       }
     case 'REMOVE_NODE':
@@ -154,12 +170,12 @@ function reducer(state: Store, action: Action): Store {
         nodes: state.nodes.map((n) =>
           n.id === action.payload.id
             ? {
-              ...merge(n, action.payload.node),
-              position: {
-                x: n.position.x || action.payload.node.position?.x || 0,
-                y: n.position.y || action.payload.node.position?.y || 0,
-              },
-            }
+                ...merge(n, action.payload.node),
+                position: {
+                  x: n.position.x || action.payload.node.position?.x || 0,
+                  y: n.position.y || action.payload.node.position?.y || 0,
+                },
+              }
             : n
         ),
       }
@@ -170,7 +186,19 @@ function reducer(state: Store, action: Action): Store {
         ...state,
         courses: state.courses.map((c) => (c.id === action.payload ? { ...c, path: [] } : c)),
         nodes: state.nodes.map((n) =>
-          targetCourse.nodes.includes(n.id) ? { ...n, data: { ...n.data, content: undefined, answerId: undefined, inputContentResponse: undefined, userResponse: undefined, imgUrlContent: undefined } } : n
+          targetCourse.nodes.includes(n.id)
+            ? {
+                ...n,
+                data: {
+                  ...n.data,
+                  content: undefined,
+                  answerId: undefined,
+                  inputContentResponse: undefined,
+                  userResponse: undefined,
+                  imgUrlContent: undefined,
+                },
+              }
+            : n
         ),
       }
     case 'RESET_LEVEL':
@@ -186,23 +214,28 @@ function reducer(state: Store, action: Action): Store {
       return {
         ...state,
         courses: state.courses.map((c) =>
-          c.id === action.payload
-            ? { ...c, path: [startCourse.startNodeId] }
-            : c
+          c.id === action.payload ? { ...c, path: [startCourse.startNodeId] } : c
         ),
       }
     case 'NEXT_NODE':
       return {
         ...state,
         courses: state.courses.map((c) =>
-          c.id === action.payload.currentCourseId ? { ...c, path: [...c.path, action.payload.nextNodeId] } : c
+          c.id === action.payload.currentCourseId
+            ? { ...c, path: [...c.path, action.payload.nextNodeId] }
+            : c
         ),
         nodes: state.nodes.map((n) =>
-          n.id === action.payload.currentNodeId ? { ...n, data: {
-            ...n.data,
-            answerId: action.payload.type === 'quiz' ? action.payload.data : undefined,
-            userResponse: action.payload.type === 'input' ? action.payload.data : undefined,
-          } } : n
+          n.id === action.payload.currentNodeId
+            ? {
+                ...n,
+                data: {
+                  ...n.data,
+                  answerId: action.payload.type === 'quiz' ? action.payload.data : undefined,
+                  userResponse: action.payload.type === 'input' ? action.payload.data : undefined,
+                },
+              }
+            : n
         ),
       }
     case 'REMOVE_EDGE':
@@ -264,7 +297,7 @@ export function useStoreActions() {
       toast.success(`Course "${course.name}" added successfully`)
     },
     removeCourse: (courseId: string) => {
-      const courseName = state.courses.find((c) => c.id === courseId)?.name;
+      const courseName = state.courses.find((c) => c.id === courseId)?.name
       dispatch({ type: 'REMOVE_COURSE', payload: courseId })
       toast.success(`Course ${courseName || courseId} removed successfully`)
     },
@@ -278,7 +311,7 @@ export function useStoreActions() {
     },
     removeNode: (nodeId: string) => {
       dispatch({ type: 'REMOVE_NODE', payload: nodeId })
-      const nodeLabel = state.nodes.find((n) => n.id === nodeId)?.data.label;
+      const nodeLabel = state.nodes.find((n) => n.id === nodeId)?.data.label
       toast.success(`Node ${nodeLabel || nodeId} removed successfully`)
     },
     editNode: (nodeId: string, node: Partial<Node>) => {
@@ -287,78 +320,112 @@ export function useStoreActions() {
     },
     resetCourse: (courseId: string) => {
       dispatch({ type: 'RESET_COURSE', payload: courseId })
-      const courseName = state.courses.find((c) => c.id === courseId)?.name;
+      const courseName = state.courses.find((c) => c.id === courseId)?.name
       toast.success(`Course "${courseName}" progress has been reset`)
     },
     resetProgress: () => {
       dispatch({ type: 'RESET_LEVEL' })
       dispatch({ type: 'UPDATE_SYSTEM_CONTEXT', payload: '' })
-      dispatch({ type: 'END_LOADING' });
+      dispatch({ type: 'END_LOADING' })
       toast.success('Current level and context has been reset')
     },
     startCourse: async (courseId: string) => {
-      dispatch({ type: 'START_LOADING' });
-      const currentCourse = state.courses.find((c) => c.id === courseId);
-      const startNode = state?.nodes.find((n) => n.id === currentCourse?.startNodeId);
-      if (!currentCourse?.startNodeId || !startNode) return;
+      dispatch({ type: 'START_LOADING' })
+      const currentCourse = state.courses.find((c) => c.id === courseId)
+      const startNode = state?.nodes.find((n) => n.id === currentCourse?.startNodeId)
+      if (!currentCourse?.startNodeId || !startNode) return
 
-      const systemContext = buildSystemContext(state.systemContext, startNode.data.userContext, startNode.data.companyContext, 'User started the course');
-      const { content, imgUrlContent } = await getNodeContent(startNode, systemContext);
+      const systemContext = buildSystemContext(
+        state.systemContext,
+        startNode.data.userContext,
+        startNode.data.companyContext,
+        'User started the course'
+      )
+      const { content, imgUrlContent } = await getNodeContent(startNode, systemContext)
       generateNewContext(systemContext, content).then((newContext) => {
-        dispatch({ type: 'UPDATE_SYSTEM_CONTEXT', payload: newContext });
-        console.log('new context delivered... dont shame me for race condition, i know :/', newContext)
+        dispatch({ type: 'UPDATE_SYSTEM_CONTEXT', payload: newContext })
+        console.log(
+          'new context delivered... dont shame me for race condition, i know :/',
+          newContext
+        )
       })
 
-      dispatch({ type: 'EDIT_NODE', payload: { id: currentCourse.startNodeId, node: { data: { content, imgUrlContent } } } })
-      dispatch({ type: 'START_COURSE', payload: courseId });
-      dispatch({ type: 'END_LOADING' });
+      dispatch({
+        type: 'EDIT_NODE',
+        payload: { id: currentCourse.startNodeId, node: { data: { content, imgUrlContent } } },
+      })
+      dispatch({ type: 'START_COURSE', payload: courseId })
+      dispatch({ type: 'END_LOADING' })
     },
-    nextNode: async (courseId: string, nodeId: string, type: 'next' | 'quiz' | 'input', data?: any) => {
+    nextNode: async (
+      courseId: string,
+      nodeId: string,
+      type: 'next' | 'quiz' | 'input',
+      data?: any
+    ) => {
       const currentCourse = state.courses.find((c) => c.id === courseId)
-      if (!currentCourse) return;
-      const currentNode = state.nodes.find((n) => n.id === currentCourse.path[currentCourse.path.length - 1]);
-      if (!currentNode) return;
+      if (!currentCourse) return
+      const currentNode = state.nodes.find(
+        (n) => n.id === currentCourse.path[currentCourse.path.length - 1]
+      )
+      if (!currentNode) return
 
-      dispatch({ type: 'START_LOADING' });
+      dispatch({ type: 'START_LOADING' })
 
       const nextNodeIds = currentCourse.edges
         .filter((e) => e.source === nodeId)
         .map((e) => e.target)
-        .filter((id) => id !== undefined) as string[];
+        .filter((id) => id !== undefined) as string[]
 
-      const nextNodes = nextNodeIds.map((id) => state.nodes.find((n) => n.id === id));
+      const nextNodes = nextNodeIds.map((id) => state.nodes.find((n) => n.id === id))
 
-      let nextNodeId: string | undefined;
-      let preparedDataForContext = '';
-      let isLvlUp = false;
+      let nextNodeId: string | undefined
+      let preparedDataForContext = ''
+      let isLvlUp = false
       switch (type) {
         case 'next':
-          preparedDataForContext = `User read ${currentNode?.data.content} and pressed next button`;
-          break;
+          preparedDataForContext = `User read ${currentNode?.data.content} and pressed next button`
+          break
         case 'input':
-          preparedDataForContext = `User answered with the following: ${data} for our question: ${currentNode?.data.content}`;
-          break;
+          preparedDataForContext = `User answered with the following: ${data} for our question: ${currentNode?.data.content}`
+          break
         case 'quiz':
-          const selectedOption = currentNode?.data.quizOptions?.find((o) => o.id === data);
-          preparedDataForContext = `We asked: ${currentNode?.data.content}\nand user choose: ${selectedOption?.label} ${selectedOption?.isRight ? ', we marked it right' : ''} ${selectedOption?.upLevel ? 'and its high beyound his level, we level up him' : ''}`;
-          isLvlUp = selectedOption?.upLevel || false;
-          nextNodeId = selectedOption?.nextNode || undefined;
-          break;
+          const selectedOption = currentNode?.data.quizOptions?.find((o) => o.id === data)
+          preparedDataForContext = `We asked: ${currentNode?.data.content}\nand user choose: ${selectedOption?.label} ${selectedOption?.isRight ? ', we marked it right' : ''} ${selectedOption?.upLevel ? 'and its high beyound his level, we level up him' : ''}`
+          isLvlUp = selectedOption?.upLevel || false
+          nextNodeId = selectedOption?.nextNode || undefined
+          break
       }
 
       // navigation
       if (nextNodes.length === 1 && nextNodeIds[0]) {
-        nextNodeId = nextNodeIds[0];
-        dispatch({ type: 'NEXT_NODE', payload: { currentCourseId: courseId, nextNodeId: nextNodeIds[0], currentNodeId: currentNode.id, type: 'next' } });
+        nextNodeId = nextNodeIds[0]
+        dispatch({
+          type: 'NEXT_NODE',
+          payload: {
+            currentCourseId: courseId,
+            nextNodeId: nextNodeIds[0],
+            currentNodeId: currentNode.id,
+            type: 'next',
+          },
+        })
       } else if (nextNodeId) {
-        dispatch({ type: 'NEXT_NODE', payload: { currentCourseId: courseId, nextNodeId: nextNodeId, currentNodeId: currentNode.id, type: 'next' } });
+        dispatch({
+          type: 'NEXT_NODE',
+          payload: {
+            currentCourseId: courseId,
+            nextNodeId: nextNodeId,
+            currentNodeId: currentNode.id,
+            type: 'next',
+          },
+        })
       } else {
         const nextNodesPrepared = nextNodes.map((n, i) => ({
           nodeIndex: i,
           label: n?.data.label,
           type: n?.data.type,
           difficult: n?.data.difficult,
-        }));
+        }))
 
         const prompt = `
           ${NEXT_NODE_DECISION_PROMPT}
@@ -367,39 +434,62 @@ export function useStoreActions() {
           nextNodesPrepared: ${JSON.stringify(nextNodesPrepared)}
         `
 
-        const nextNodeIndex = await llmSystemRequest<string>(prompt, 'number', state.systemContext);
-        const decidedNextNodeId = nextNodes[parseInt(nextNodeIndex, 10)]?.id || nextNodeIds[0];
-        nextNodeId = decidedNextNodeId;
+        const nextNodeIndex = await llmSystemRequest<string>(prompt, 'number', state.systemContext)
+        const decidedNextNodeId = nextNodes[parseInt(nextNodeIndex, 10)]?.id || nextNodeIds[0]
+        nextNodeId = decidedNextNodeId
 
         if (!nextNodes[parseInt(nextNodeIndex, 10)]?.id) {
-          console.error(`Next node index (${nextNodeIndex}) is out of bounds, fallback to first node...`, nextNodesPrepared);
+          console.error(
+            `Next node index (${nextNodeIndex}) is out of bounds, fallback to first node...`,
+            nextNodesPrepared
+          )
         }
 
-        dispatch({ type: 'NEXT_NODE', payload: { currentCourseId: courseId, nextNodeId: decidedNextNodeId, currentNodeId: currentNode.id, type, data } });
-      };
+        dispatch({
+          type: 'NEXT_NODE',
+          payload: {
+            currentCourseId: courseId,
+            nextNodeId: decidedNextNodeId,
+            currentNodeId: currentNode.id,
+            type,
+            data,
+          },
+        })
+      }
 
       // one more last preparation (:
-      const nextNode = state.nodes.find((n) => n.id === nextNodeId) as Node;
+      const nextNode = state.nodes.find((n) => n.id === nextNodeId) as Node
 
       // system context and building new content
-      const systemContext = buildSystemContext(state.systemContext, nextNode.data.userContext, nextNode.data.companyContext, preparedDataForContext);
-      const { content, imgUrlContent } = await getNodeContent(nextNode, systemContext);
+      const systemContext = buildSystemContext(
+        state.systemContext,
+        nextNode.data.userContext,
+        nextNode.data.companyContext,
+        preparedDataForContext
+      )
+      const { content, imgUrlContent } = await getNodeContent(nextNode, systemContext)
 
       generateNewContext(systemContext, content).then((newContext) => {
-        dispatch({ type: 'UPDATE_SYSTEM_CONTEXT', payload: newContext });
-        console.log('new context delivered... dont shame me for race condition, i know :/', newContext)
+        dispatch({ type: 'UPDATE_SYSTEM_CONTEXT', payload: newContext })
+        console.log(
+          'new context delivered... dont shame me for race condition, i know :/',
+          newContext
+        )
       })
 
       // dispatch new shit!
-      dispatch({ type: 'EDIT_NODE', payload: { id: nextNode.id, node: { data: { content, imgUrlContent } } } })
-      dispatch({ type: 'END_LOADING' });
+      dispatch({
+        type: 'EDIT_NODE',
+        payload: { id: nextNode.id, node: { data: { content, imgUrlContent } } },
+      })
+      dispatch({ type: 'END_LOADING' })
       if (isLvlUp) {
-        dispatch({ type: 'LEVEL_UP' });
+        dispatch({ type: 'LEVEL_UP' })
       }
     },
     removeEdge: (courseId: string, edgeId: string) => {
       dispatch({ type: 'REMOVE_EDGE', payload: { courseId, edgeId } })
-      const courseName = state.courses.find((c) => c.id === courseId)?.name;
+      const courseName = state.courses.find((c) => c.id === courseId)?.name
       toast.success(`Connection #${edgeId} removed from course "${courseName || courseId}"`)
     },
     updateSystemContext: (context: string) => {
@@ -408,70 +498,71 @@ export function useStoreActions() {
     },
     finishCourse: (courseId: string) => {
       dispatch({ type: 'FINISH_COURSE', payload: courseId })
-      const courseName = state.courses.find((c) => c.id === courseId)?.name;
+      const courseName = state.courses.find((c) => c.id === courseId)?.name
       toast.success(`Course "${courseName || courseId}" finished`)
     },
     seedStorage: () => {
       dispatch({ type: 'SEED_STORAGE' })
       toast.success('Storage seeded')
-    }
+    },
   }
 }
 
 async function getNodeContent(node: Node, systemContext: string) {
   console.log('node_content_before', node)
-  let content = '', imgUrlContent = '';
+  let content = '',
+    imgUrlContent = ''
 
   switch (node.data.type) {
     case 'text':
       if (node.data.baked) {
-        content = node.data.baked;
+        content = node.data.baked
       } else {
-        content = await llmRequest(node.data.prompt || '', SYSTEM_TEXT_PROMPT, systemContext);
+        content = await llmRequest(node.data.prompt || '', SYSTEM_TEXT_PROMPT, systemContext)
       }
-      break;
+      break
     case 'image':
       if (node.data.imgUrlBaked) {
-        imgUrlContent = node.data.imgUrlBaked;
+        imgUrlContent = node.data.imgUrlBaked
       } else {
-        imgUrlContent = await generateImage(node.data.imgPrompt!);
+        imgUrlContent = await generateImage(node.data.imgPrompt!)
       }
-      break;
+      break
     case 'cards':
       if (node.data.baked) {
-        content = node.data.baked;
+        content = node.data.baked
       } else {
-        content = await llmRequest(node.data.prompt || '', SYSTEM_CARDS_PROMPT, systemContext);
+        content = await llmRequest(node.data.prompt || '', SYSTEM_CARDS_PROMPT, systemContext)
       }
       if (node.data.imgUrlBaked) {
-        imgUrlContent = node.data.imgUrlBaked;
+        imgUrlContent = node.data.imgUrlBaked
       } else {
-        imgUrlContent = await generateImage(node.data.imgPrompt!);
+        imgUrlContent = await generateImage(node.data.imgPrompt!)
       }
-      break;
+      break
     case 'quiz':
       if (node.data.baked) {
-        content = node.data.baked;
+        content = node.data.baked
       } else {
-        content = await llmRequest(node.data.prompt || '', SYSTEM_QUIZ_PROMPT, systemContext);
+        content = await llmRequest(node.data.prompt || '', SYSTEM_QUIZ_PROMPT, systemContext)
       }
-      break;
+      break
     case 'input':
       if (node.data.baked) {
-        content = node.data.baked;
+        content = node.data.baked
       } else {
-        content = await llmRequest(node.data.prompt || '', SYSTEM_INPUT_PROMPT, systemContext);
+        content = await llmRequest(node.data.prompt || '', SYSTEM_INPUT_PROMPT, systemContext)
       }
-      break;
+      break
   }
 
   return { content, imgUrlContent }
 }
 
 function buildSystemContext(...contexts: (string | undefined)[]) {
-  return contexts.filter(Boolean).join('\n\n');
+  return contexts.filter(Boolean).join('\n\n')
 }
 
 async function generateNewContext(systemContext: string, content: string) {
-  return await llmRequest(systemContext, `${BASE_HISTORY_PROMPT}\n${content}`);
+  return await llmRequest(systemContext, `${BASE_HISTORY_PROMPT}\n${content}`)
 }

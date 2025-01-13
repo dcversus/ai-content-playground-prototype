@@ -1,4 +1,4 @@
-import { CaseSensitiveIcon, ListTodo, Image, IdCard, Code, Video } from 'lucide-react'
+import { CaseSensitiveIcon, Code, IdCard, Image, ListTodo, Video } from 'lucide-react'
 
 export const typeToIcon = {
   text: CaseSensitiveIcon,

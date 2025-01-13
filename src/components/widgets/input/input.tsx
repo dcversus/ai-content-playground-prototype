@@ -11,7 +11,6 @@ interface InputWidgetProps {
   userResponse?: string
   promptInputContent?: string
   onSend: (content: string) => void
-  isLastNode: boolean
   isLoading?: boolean
 }
 
@@ -20,8 +19,7 @@ export function InputWidget({
   userResponse,
   promptInputContent,
   onSend,
-  isLastNode,
-  isLoading
+  isLoading,
 }: InputWidgetProps) {
   const [value, setValue] = useState('')
 
@@ -54,10 +52,7 @@ export function InputWidget({
             value={value}
             onChange={(e) => setValue(e.target.value)}
             placeholder="Type your answer here..."
-            className={cn(
-              "min-h-[200px] resize-none",
-              isLoading && "opacity-50"
-            )}
+            className={cn('min-h-[200px] resize-none', isLoading && 'opacity-50')}
             disabled={isLoading}
           />
         )}
@@ -71,7 +66,7 @@ export function InputWidget({
             disabled={!value.trim() || isLoading}
             size="lg"
           >
-            {isLoading ? "Processing..." : "Send"}
+            {isLoading ? 'Processing...' : 'Send'}
           </Button>
         </CardFooter>
       )}

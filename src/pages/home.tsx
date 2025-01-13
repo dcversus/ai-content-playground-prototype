@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { BookOpenText, RotateCcw, TriangleAlert, Database, Presentation } from 'lucide-react'
+import { BookOpenText, Database, Presentation, RotateCcw, TriangleAlert } from 'lucide-react'
 import { toast } from 'sonner'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -52,7 +52,8 @@ import { Textarea } from '@/components/ui/textarea'
 export function Home() {
   const navigate = useNavigate()
   const { state } = useStore()
-  const { resetProgress, resetCourse, addCourse, removeCourse, updateSystemContext, seedStorage } = useStoreActions()
+  const { resetProgress, resetCourse, addCourse, removeCourse, updateSystemContext, seedStorage } =
+    useStoreActions()
   const [newCourseName, setNewCourseName] = useState('')
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isSystemContextOpen, setIsSystemContextOpen] = useState(false)
@@ -96,7 +97,11 @@ export function Home() {
         <header className="mb-8 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <h1 className="text-3xl font-bold">Courses</h1>
-            <a href="https://docs.google.com/presentation/d/1gr2txcVS-kN9JZVobuyHVlnx8ufgi_YEcX5qw4WZrDg/edit?usp=sharing" target="_blank" rel="noopener noreferrer">
+            <a
+              href="https://docs.google.com/presentation/d/1gr2txcVS-kN9JZVobuyHVlnx8ufgi_YEcX5qw4WZrDg/edit?usp=sharing"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Button variant="ghost" size="icon">
                 <Presentation className="h-4 w-4" />
               </Button>
@@ -142,7 +147,8 @@ export function Home() {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Reset Level and Context?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This will reset your current level to 0 and context. This action cannot be undone.
+                    This will reset your current level to 0 and context. This action cannot be
+                    undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -162,14 +168,22 @@ export function Home() {
           <AlertTitle>Heads up!</AlertTitle>
           <AlertDescription>
             This is a very early prototype to show the concept of gradient content model and simple
-            sandbox to show small piece of it. There will be bugs, lots of bugs, lots of them.
-            Also prototype always generate content, real UX will be pre-gened and user will not wait.
-            I used cheap LLM model and dont frame it. Brief presenation <a href="https://docs.google.com/presentation/d/1gr2txcVS-kN9JZVobuyHVlnx8ufgi_YEcX5qw4WZrDg/edit?usp=sharing" target="_blank" rel="noopener noreferrer" className="text-blue-500">here</a>
+            sandbox to show small piece of it. There will be bugs, lots of bugs, lots of them. Also
+            prototype always generate content, real UX will be pre-gened and user will not wait. I
+            used cheap LLM model and dont frame it. Brief presenation{' '}
+            <a
+              href="https://docs.google.com/presentation/d/1gr2txcVS-kN9JZVobuyHVlnx8ufgi_YEcX5qw4WZrDg/edit?usp=sharing"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500"
+            >
+              here
+            </a>
           </AlertDescription>
         </Alert>
 
         {state.courses.length === 0 ? (
-          <Card className="flex flex-col items-center p-8 text-center bg-muted">
+          <Card className="flex flex-col items-center bg-muted p-8 text-center">
             <CardHeader className="flex flex-col items-center">
               <BookOpenText className="h-12 w-12 text-muted-foreground" />
               <CardTitle className="mt-4 text-2xl">No Courses Yet</CardTitle>
@@ -180,7 +194,9 @@ export function Home() {
             <CardContent className="flex flex-col items-center gap-4">
               <Button onClick={() => seedStorage()}>Seed Storage</Button>
               Or
-              <Button onClick={() => setIsDialogOpen(true)} variant="outline">Create New Course</Button>
+              <Button onClick={() => setIsDialogOpen(true)} variant="outline">
+                Create New Course
+              </Button>
             </CardContent>
           </Card>
         ) : (
@@ -246,8 +262,8 @@ export function Home() {
                               <AlertDialogHeader>
                                 <AlertDialogTitle>Remove Course?</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  This will permanently delete the course and all its content. This action cannot be
-                                  undone.
+                                  This will permanently delete the course and all its content. This
+                                  action cannot be undone.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>

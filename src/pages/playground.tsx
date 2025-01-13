@@ -1,17 +1,17 @@
+import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Loader2, PartyPopper } from 'lucide-react'
-import { useState } from 'react'
 
 import { useStore, useStoreActions } from '@/app/store'
 import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
+import { Skeleton } from '@/components/ui/skeleton'
 import { CardWidget } from '@/components/widgets/card/card'
 import { ImageWidget } from '@/components/widgets/image/image'
 import { InputWidget } from '@/components/widgets/input/input'
 import { QuizWidget } from '@/components/widgets/quiz/quiz'
 import { TextWidget } from '@/components/widgets/text/text'
 import { VideoWidget } from '@/components/widgets/video/video'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Separator } from '@/components/ui/separator'
 
 const widgetMap = {
   text: TextWidget,
@@ -43,13 +43,19 @@ export function Playground() {
     return (
       <div className="flex h-screen flex-col items-center justify-center">
         <h1 className="mb-4 text-4xl font-bold">{course.name}</h1>
-        <p className="mb-8 text-lg text-muted-foreground prose p-6 dark:prose-invert">{course.description}</p>
-        <Button isLoading={state.isLoading} onClick={() => startCourse(course.id)}>Start</Button>
+        <p className="prose mb-8 p-6 text-lg text-muted-foreground dark:prose-invert">
+          {course.description}
+        </p>
+        <Button isLoading={state.isLoading} onClick={() => startCourse(course.id)}>
+          Start
+        </Button>
       </div>
     )
   }
 
-  const isLastCourseNode = !course.edges.some((e) => e.source === course.path[course.path.length - 1])
+  const isLastCourseNode = !course.edges.some(
+    (e) => e.source === course.path[course.path.length - 1]
+  )
 
   const handleFinish = () => {
     finishCourse(course.id)
@@ -75,14 +81,16 @@ export function Playground() {
       <main className="container py-8">
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-8">
           {nodes.map((node) => {
-            const Widget = widgetMap[node.data.type as keyof typeof widgetMap] as React.ComponentType<any>
+            const Widget = widgetMap[
+              node.data.type as keyof typeof widgetMap
+            ] as React.ComponentType<any>
             const isLastOpenedNode = node.id === course.path[course.path.length - 1]
 
             if (state.isLoading && isLastOpenedNode) {
               return (
-                <div key={node.id} className="w-full lg:p-0 p-6">
-                  <Skeleton className="h-[200px] w-full rounded-xl flex items-center justify-center">
-                    <Loader2 className="h-12 w-12 animate-spin animate-pulse" />
+                <div key={node.id} className="w-full p-6 lg:p-0">
+                  <Skeleton className="flex h-[200px] w-full items-center justify-center rounded-xl">
+                    <Loader2 className="h-12 w-12 animate-pulse animate-spin" />
                   </Skeleton>
                 </div>
               )
@@ -105,24 +113,26 @@ export function Playground() {
           {isLastCourseNode && (
             <div className="flex justify-center">
               {isFinishing ? (
-                <div className="fixed inset-0 z-50 flex flex-col items-center justify-center animate-fade-in">
+                <div className="animate-fade-in fixed inset-0 z-50 flex flex-col items-center justify-center">
                   <div className="absolute inset-0 bg-background/95 backdrop-blur" />
                   <div className="z-10 flex flex-col items-center">
                     <div className="animate-bounce">
                       <PartyPopper className="h-16 w-16 text-primary" />
                     </div>
-                    <h1 className="mt-6 animate-fade-up text-4xl font-bold">
-                      Congratulations!
-                    </h1>
-                    <p className="mt-2 animate-fade-up text-lg text-muted-foreground">
+                    <h1 className="animate-fade-up mt-6 text-4xl font-bold">Congratulations!</h1>
+                    <p className="animate-fade-up mt-2 text-lg text-muted-foreground">
                       You've completed the course!
                     </p>
                   </div>
                 </div>
               ) : (
                 <div className="flex gap-4">
-                  <Button size="lg" onClick={handleFinish}>Finish</Button>
-                  <Button size="lg" variant="outline" onClick={() => resetCourse(course.id)}>Reset Course Progress</Button>
+                  <Button size="lg" onClick={handleFinish}>
+                    Finish
+                  </Button>
+                  <Button size="lg" variant="outline" onClick={() => resetCourse(course.id)}>
+                    Reset Course Progress
+                  </Button>
                 </div>
               )}
             </div>

@@ -20,7 +20,9 @@ export function TextWidget({ content, baked, onNext, isLastNode, isLoading }: Te
 
       {isLastNode && (
         <CardFooter>
-          <Button onClick={onNext} isLoading={isLoading}>Next</Button>
+          <Button onClick={onNext} isLoading={isLoading}>
+            Next
+          </Button>
         </CardFooter>
       )}
     </Card>

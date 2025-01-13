@@ -1,8 +1,8 @@
-import { MousePointerClick } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
+import { MousePointerClick } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 
 interface CardWidgetProps {
@@ -16,7 +16,6 @@ interface CardWidgetProps {
   }[]
   answerId?: string
   onSelect: (optionId: string) => void
-  isLastNode: boolean
 }
 
 export function CardWidget({
@@ -27,7 +26,6 @@ export function CardWidget({
   quizOptions,
   answerId,
   onSelect,
-  isLastNode
 }: CardWidgetProps) {
   return (
     <Card className="w-full">
@@ -42,7 +40,7 @@ export function CardWidget({
 
       <CardContent className="p-6">
         <div className="flex flex-col gap-6">
-          <div className="prose dark:prose-invert max-w-none">
+          <div className="prose max-w-none dark:prose-invert">
             <ReactMarkdown>{content || baked}</ReactMarkdown>
           </div>
 
@@ -55,8 +53,8 @@ export function CardWidget({
                   key={option.id}
                   variant="outline"
                   className={cn(
-                    "h-auto p-4 text-left flex items-center justify-between",
-                    isSelected && "border-primary"
+                    'flex h-auto items-center justify-between p-4 text-left',
+                    isSelected && 'border-primary'
                   )}
                   disabled={!!answerId}
                   onClick={() => onSelect(option.id)}

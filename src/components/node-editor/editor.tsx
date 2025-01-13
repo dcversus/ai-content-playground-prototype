@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
-import { CirclePlus, Pen, ChevronUp, Lightbulb, Trash2 } from 'lucide-react'
+import { useParams } from 'react-router-dom'
+import { ChevronUp, CirclePlus, Lightbulb, Pen, Trash2 } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 
+import { useStore } from '@/app/store'
 import {
   Accordion,
   AccordionContent,
@@ -18,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Separator } from '@/components/ui/separator'
 import {
   Sheet,
   SheetContent,
@@ -28,10 +31,8 @@ import {
 } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-import { Separator } from '@/components/ui/separator'
-import { typeToIcon, NodeType } from './types'
-import { useStore } from '@/app/store'
-import { useParams } from 'react-router-dom'
+
+import { NodeType, typeToIcon } from './types'
 
 interface EditorProps {
   id: string
@@ -64,17 +65,17 @@ interface EditorProps {
 }
 
 export function Editor({ data, id, isNew }: EditorProps) {
-  const { id: courseId } = useParams();
-  const { state } = useStore();
-  const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState(data);
+  const { id: courseId } = useParams()
+  const { state } = useStore()
+  const [open, setOpen] = useState(false)
+  const [formData, setFormData] = useState(data)
 
   useEffect(() => {
     document.getElementById('root')?.setAttribute('data-dialog-open', open.toString())
   }, [open])
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     console.log('formData', formData)
 
     const { onEdit, onAdd, onDelete, ...data } = formData
@@ -88,14 +89,18 @@ export function Editor({ data, id, isNew }: EditorProps) {
     setOpen(false)
   }
 
-  const handleQuizOptionToggle = (optionId: string, field: 'isRight' | 'upLevel', value: boolean) => {
+  const handleQuizOptionToggle = (
+    optionId: string,
+    field: 'isRight' | 'upLevel',
+    value: boolean
+  ) => {
     console.log(formData.quizOptions)
-    const newOptions = formData.quizOptions?.map(option => {
+    const newOptions = formData.quizOptions?.map((option) => {
       if (field === 'isRight') {
         // Only one option can be right
         return {
           ...option,
-          isRight: option.id === optionId ? true : false
+          isRight: option.id === optionId ? true : false,
         }
       }
 
@@ -108,14 +113,13 @@ export function Editor({ data, id, isNew }: EditorProps) {
     setFormData({ ...formData, quizOptions: newOptions })
   }
 
-  const currentCourse = state.courses.find(c => c.id === courseId)
-  const connectedNodeIds = currentCourse?.edges
-    ?.filter(edge => edge.source === id)
-    ?.map(edge => edge.target) || []
-  const connectedNodes = state.nodes.filter(node => connectedNodeIds.includes(node.id))
+  const currentCourse = state.courses.find((c) => c.id === courseId)
+  const connectedNodeIds =
+    currentCourse?.edges?.filter((edge) => edge.source === id)?.map((edge) => edge.target) || []
+  const connectedNodes = state.nodes.filter((node) => connectedNodeIds.includes(node.id))
 
   const handleDeleteOption = (optionId: string) => {
-    const newOptions = formData.quizOptions?.filter(o => o.id !== optionId)
+    const newOptions = formData.quizOptions?.filter((o) => o.id !== optionId)
     setFormData({ ...formData, quizOptions: newOptions })
   }
 
@@ -132,7 +136,7 @@ export function Editor({ data, id, isNew }: EditorProps) {
           </Button>
         )}
       </SheetTrigger>
-      <SheetContent className="overflow-y-auto max-w-2xl">
+      <SheetContent className="max-w-2xl overflow-y-auto">
         <SheetHeader className="mb-6">
           <SheetTitle>{isNew ? 'Add Node' : 'Edit Node'}</SheetTitle>
           <SheetDescription>
@@ -153,7 +157,9 @@ export function Editor({ data, id, isNew }: EditorProps) {
                 <SelectContent>
                   {Object.entries(typeToIcon).map(([type, Icon]) => (
                     <SelectItem key={type} value={type}>
-                      <span className="capitalize inline-flex gap-2 items-center"><Icon className="h-4 w-4" /> {type}</span>
+                      <span className="inline-flex items-center gap-2 capitalize">
+                        <Icon className="h-4 w-4" /> {type}
+                      </span>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -168,7 +174,9 @@ export function Editor({ data, id, isNew }: EditorProps) {
                 min="1"
                 max="13"
                 value={formData.difficult || 1}
-                onChange={(e) => setFormData({ ...formData, difficult: parseInt(e.target.value) || 1 })}
+                onChange={(e) =>
+                  setFormData({ ...formData, difficult: parseInt(e.target.value) || 1 })
+                }
               />
             </div>
           </div>
@@ -231,7 +239,9 @@ export function Editor({ data, id, isNew }: EditorProps) {
                         <Input
                           id="imgUrl"
                           value={formData.imgUrlBaked}
-                          onChange={(e) => setFormData({ ...formData, imgUrlBaked: e.target.value })}
+                          onChange={(e) =>
+                            setFormData({ ...formData, imgUrlBaked: e.target.value })
+                          }
                         />
                       </div>
                     )}
@@ -239,8 +249,6 @@ export function Editor({ data, id, isNew }: EditorProps) {
                 </AccordionContent>
               </AccordionItem>
             )}
-
-
           </Accordion>
 
           {['image', 'cards'].includes(formData.type) && (
@@ -316,12 +324,12 @@ export function Editor({ data, id, isNew }: EditorProps) {
 
               <div className="space-y-3">
                 {formData.quizOptions?.map((option) => (
-                  <div key={option.id} className="rounded-lg border p-4 space-y-3">
+                  <div key={option.id} className="space-y-3 rounded-lg border p-4">
                     <div className="flex items-center gap-2">
                       <Input
                         value={option.label}
                         onChange={(e) => {
-                          const newOptions = formData.quizOptions?.map(o =>
+                          const newOptions = formData.quizOptions?.map((o) =>
                             o.id === option.id ? { ...o, label: e.target.value } : o
                           )
                           setFormData({ ...formData, quizOptions: newOptions })
@@ -343,7 +351,9 @@ export function Editor({ data, id, isNew }: EditorProps) {
                       <ToggleGroup type="single" value={option.isRight ? option.id : undefined}>
                         <ToggleGroupItem
                           value={option.id}
-                          onClick={() => handleQuizOptionToggle(option.id, 'isRight', !option.isRight)}
+                          onClick={() =>
+                            handleQuizOptionToggle(option.id, 'isRight', !option.isRight)
+                          }
                           className="gap-2"
                         >
                           <Lightbulb className="h-4 w-4" />
@@ -352,7 +362,9 @@ export function Editor({ data, id, isNew }: EditorProps) {
                       <ToggleGroup type="multiple" value={option.upLevel ? [option.id] : []}>
                         <ToggleGroupItem
                           value={option.id}
-                          onClick={() => handleQuizOptionToggle(option.id, 'upLevel', !option.upLevel)}
+                          onClick={() =>
+                            handleQuizOptionToggle(option.id, 'upLevel', !option.upLevel)
+                          }
                           className="gap-2"
                         >
                           <ChevronUp className="h-4 w-4" />
@@ -361,7 +373,7 @@ export function Editor({ data, id, isNew }: EditorProps) {
                       <Select
                         value={option.nextNode}
                         onValueChange={(value) => {
-                          const newOptions = formData.quizOptions?.map(o =>
+                          const newOptions = formData.quizOptions?.map((o) =>
                             o.id === option.id ? { ...o, nextNode: value } : o
                           )
                           setFormData({ ...formData, quizOptions: newOptions })
@@ -371,11 +383,11 @@ export function Editor({ data, id, isNew }: EditorProps) {
                           <SelectValue placeholder="Select next node" />
                         </SelectTrigger>
                         <SelectContent>
-                          {connectedNodes.map(node => (
-                              <SelectItem key={node.id} value={node.id}>
-                                {node.data.label}
-                              </SelectItem>
-                            ))}
+                          {connectedNodes.map((node) => (
+                            <SelectItem key={node.id} value={node.id}>
+                              {node.data.label}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>
@@ -385,7 +397,9 @@ export function Editor({ data, id, isNew }: EditorProps) {
             </div>
           )}
 
-          <Button type="submit" className="mt-6">Save</Button>
+          <Button type="submit" className="mt-6">
+            Save
+          </Button>
         </form>
       </SheetContent>
     </Sheet>
