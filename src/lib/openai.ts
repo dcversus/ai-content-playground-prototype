@@ -1,10 +1,23 @@
 import OpenAI from 'openai'
 import { ChatCompletionMessageParam } from 'openai/resources/chat/completions.mjs'
 
-const openai = new OpenAI({
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+export const getApiKey = () => {
+  const storedKey = localStorage.getItem('openai_api_key')
+  return storedKey || import.meta.env.VITE_OPENAI_API_KEY
+}
+
+const createOpenAIClient = () => new OpenAI({
+  apiKey: getApiKey(),
   dangerouslyAllowBrowser: true,
 })
+
+// Create a new client instance when the API key changes
+let openai = createOpenAIClient()
+
+export const updateApiKey = (newKey: string) => {
+  localStorage.setItem('openai_api_key', newKey)
+  openai = createOpenAIClient()
+}
 
 export async function llmRequest(
   message: string,

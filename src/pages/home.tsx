@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { BookOpenText, Database, Presentation, RotateCcw, TriangleAlert } from 'lucide-react'
+import { BookOpenText, Database, Key, Presentation, RotateCcw, TriangleAlert } from 'lucide-react'
 import { toast } from 'sonner'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -48,6 +48,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Textarea } from '@/components/ui/textarea'
+import { updateApiKey, getApiKey } from '@/lib/openai'
 
 export function Home() {
   const navigate = useNavigate()
@@ -58,6 +59,15 @@ export function Home() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isSystemContextOpen, setIsSystemContextOpen] = useState(false)
   const [systemContext, setSystemContext] = useState(state.systemContext || '')
+  const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false)
+  const [apiKey, setApiKey] = useState(getApiKey() || '')
+
+  useEffect(() => {
+    // Show modal by default if no API key is set
+    if (!getApiKey()) {
+      setIsApiKeyModalOpen(true)
+    }
+  }, [])
 
   const handleUpdateSystemContext = () => {
     updateSystemContext(systemContext)
@@ -91,6 +101,17 @@ export function Home() {
     document.getElementById('root')?.setAttribute('data-dialog-open', open.toString())
   }
 
+  const handleUpdateApiKey = () => {
+    if (!apiKey.trim()) {
+      toast.error('Please enter an API key')
+      return
+    }
+
+    updateApiKey(apiKey)
+    setIsApiKeyModalOpen(false)
+    toast.success('API key updated successfully')
+  }
+
   return (
     <div className="flex min-h-screen flex-col items-center py-8">
       <div className="w-full max-w-4xl px-4">
@@ -108,6 +129,9 @@ export function Home() {
             </a>
           </div>
           <div className="flex items-center gap-4">
+            <Button variant="outline" size="icon" onClick={() => setIsApiKeyModalOpen(true)}>
+              <Key className="h-4 w-4" />
+            </Button>
             <Drawer open={isSystemContextOpen} onOpenChange={handleDrawerOpenChange}>
               <DrawerTrigger asChild>
                 <Button variant="outline" size="icon">
@@ -313,6 +337,32 @@ export function Home() {
             </div>
             <DialogFooter>
               <Button onClick={handleCreateCourse}>Create</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={isApiKeyModalOpen} onOpenChange={setIsApiKeyModalOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>OpenAI API Key</DialogTitle>
+              <DialogDescription>
+                Enter your OpenAI API key to use the application. The key will be stored in your browser's local storage.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="apiKey">API Key</Label>
+                <Input
+                  id="apiKey"
+                  type="password"
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  placeholder="sk-..."
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button onClick={handleUpdateApiKey}>Save</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

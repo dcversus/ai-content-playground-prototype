@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createHashRouter, RouterProvider } from 'react-router-dom'
 
 import { Toaster } from '@/components/ui/sonner'
 import { Editor } from '@/pages/editor'
@@ -8,7 +8,7 @@ import { Playground } from '@/pages/playground'
 import { routes } from './routes'
 import { StoreProvider } from './store'
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: routes.home,
     element: <Home />,
