@@ -5,7 +5,7 @@ import { Editor } from '@/pages/editor'
 import { Home } from '@/pages/home'
 import { Playground } from '@/pages/playground'
 
-import { routes } from './routes.ts'
+import { routes } from './routes'
 import { StoreProvider } from './store'
 
 const router = createBrowserRouter([
